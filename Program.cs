@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics.Eventing.Reader;
 
 namespace XmasLightControlApp
@@ -34,6 +35,21 @@ namespace XmasLightControlApp
 
                 return Results.File(filename, lastModified: info);
 
+            });
+
+            app.MapPost("/lights", async (HttpContext httpContext, IWebHostEnvironment env) =>
+            {
+                var path = env.WebRootPath ?? env.ContentRootPath;
+                var filename = Path.Join(path, "lights.txt");
+                //write body to file
+                using (var reader = new StreamReader(httpContext.Request.Body))
+                {
+                    using(var writer = new StreamWriter(filename))
+                    {
+                        await writer.WriteAsync(await reader.ReadToEndAsync());
+                    }
+                }
+                return Results.Ok();
             });
 
             app.Run();
