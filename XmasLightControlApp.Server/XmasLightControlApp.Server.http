@@ -1,0 +1,6 @@
+@XmasLightControlApp.Server_HostAddress = http://localhost:5028
+
+GET {{XmasLightControlApp.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
