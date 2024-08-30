@@ -1,4 +1,6 @@
-namespace XmasLightControlApp.Server
+using System.Diagnostics.Eventing.Reader;
+
+namespace XmasLightControlApp
 {
     public class Program
     {
@@ -12,17 +14,15 @@ namespace XmasLightControlApp.Server
 
             var app = builder.Build();
 
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
-
             // Configure the HTTP request pipeline.
 
             app.UseAuthorization();
 
             app.MapGet("/lights", (HttpContext httpContext, IWebHostEnvironment env) =>
             {
-                var path = Path.Combine(env.WebRootPath, "lights.txt");
-                var info = File.GetLastWriteTimeUtc(path);
+                var path = env.WebRootPath ?? env.ContentRootPath;
+                var filename = Path.Join(path, "lights.txt");
+                var info = File.GetLastWriteTimeUtc(filename);
                 if (httpContext.Request.Headers["If-Modified-Since"].Any())
                 {
                     var since = DateTime.Parse(httpContext.Request.Headers["If-Modified-Since"].ToString());
@@ -32,10 +32,9 @@ namespace XmasLightControlApp.Server
                     }
                 }
 
-                return Results.File(path, lastModified: DateTime.UtcNow);
-            });
+                return Results.File(filename, lastModified: info);
 
-            app.MapFallbackToFile("/index.html");
+            });
 
             app.Run();
         }

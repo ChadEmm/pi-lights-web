@@ -1,4 +1,4 @@
-namespace XmasLightControlApp.Server
+namespace XmasLightControlApp
 {
     public class WeatherForecast
     {
